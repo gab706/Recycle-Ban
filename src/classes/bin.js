@@ -15,9 +15,9 @@ module.exports.RecyclingBin = class {
                 else {
                     let files = stdout.split('\n').filter(f => f !== '')
                     for (let file of files) {
-                        if (file.endsWith('.webp') || file.endsWith('.gif')) {
+                        if (file.endsWith('.webp') || file.endsWith('.gif') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')) {
                             events.emit('file', {
-                                name: file.replace(/.webp|.gif/, ''),
+                                name: file.replace(/.webp|.gif|.png|.jpg|.jpeg/, ''),
                                 path: {
                                     absolute: file,
                                     dir: `${trashFolder}/${file}`
