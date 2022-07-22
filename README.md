@@ -1,7 +1,7 @@
 # Recycle-Ban
 
 ## Important Information
-This bot is specifically built for MacOS and such will only work on MacOS due to the location of certain directories being different on other operating systems, this bot was made with `MacOS Catalina v10.15.7` and has not been tested with newer (or older) versions, if something does not work, please submit an issue or a pull request and it will be looked into.
+This bot is specifically built for MacOS and such will only work on MacOS due to the location of certain directories being different on other operating systems, this bot was made with `MacOS Big Sur v11.6.0` and has not been tested with newer (or older) versions, if something does not work, please submit an issue or a pull request and it will be looked into.
 
 Also due to limitations, only users that are currently in the server can be banned.
 
