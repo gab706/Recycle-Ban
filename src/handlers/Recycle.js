@@ -9,7 +9,7 @@ class Recycle extends Client {
     }
 
     async start() {
-        if (process.env.TOKEN && process.env.TOKEN === '')
+        if (!process.env.TOKEN || process.env.TOKEN === '')
             throw new Error('Token not defined, please define in .env');
         await super.login(process.env.TOKEN);
     }
