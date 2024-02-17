@@ -23,4 +23,4 @@ class EventHandler {
     }
 }
 
-export default EventHandler
+export default EventHandler;

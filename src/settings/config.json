@@ -1,9 +1,0 @@
-{
-  "bin": {
-    "check_interval": 2
-  },
-  "guild": {
-    "id": "",
-    "channel": ""
-  }
-}

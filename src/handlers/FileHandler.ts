@@ -17,11 +17,11 @@ class FileHandler extends EventHandler {
     }
 
     private cycleHandler(): string[] {
-        const isWindows = process.platform === 'win32';
-        const scriptPath = isWindows ? this.batScript : this.bashScript;
+        const isWindows: boolean = process.platform === 'win32';
+        const scriptPath: string = isWindows ? this.batScript : this.bashScript;
 
         try {
-            const output = execSync(
+            const output: string = execSync(
                 `${isWindows ? 'cmd /c' : 'bash'} ${scriptPath}`,
                 { encoding: 'utf-8' });
 
