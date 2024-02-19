@@ -2,25 +2,12 @@
   "name": "recycle-ban",
   "version": "3.1.2",
   "description": "A bot that bans people from Discord when you put their avatar in the recycling bin.",
-  "main": "src/index.js",
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "node-notifier": "^10.0.1"
-  },
-  "devDependencies": {
-    "@types/async": "^3.2.24",
-    "@types/cli-spinner": "^0.2.3",
-    "@types/figlet": "^1.5.8",
-    "@types/inquirer": "^9.0.7",
-    "async": "^3.2.5",
-    "chalk": "^5.3.0",
-    "cli-spinner": "^0.2.10",
-    "dotenv": "^16.0.1",
-    "figlet": "^1.7.0",
-    "inquirer": "^9.2.14"
-  },
+  "main": "build/src/index.js",
+  "source": "src/index.ts",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "build": "tsc",
+    "start": "npm run build && cd build/src && VERSION=3.2.1 node index.js"
   },
   "repository": {
     "type": "git",
@@ -34,5 +21,26 @@
   "bugs": {
     "url": "https://github.com/gab706/Recycle-Ban/issues"
   },
-  "homepage": "https://github.com/gab706/Recycle-Ban/blob/main/README.md"
+  "homepage": "https://github.com/gab706/Recycle-Ban/blob/main/README.md",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/src/index.d.ts",
+        "default": "./dist/src/index.js"
+      }
+    }
+  },
+  "dependencies": {
+    "async": "^3.2.5",
+    "discord.js": "^14.14.1",
+    "figlet": "^1.7.0",
+    "inquirer": "^9.2.14",
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/async": "^3.2.24",
+    "@types/figlet": "^1.5.8",
+    "@types/inquirer": "^9.0.7",
+    "@types/node-notifier": "^8.0.5"
+  }
 }

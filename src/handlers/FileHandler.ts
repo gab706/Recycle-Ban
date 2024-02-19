@@ -1,37 +1,54 @@
 'use strict';
 import { execSync } from 'child_process';
-import EventHandler from './EventHandler';
+import path from 'path';
 
-class FileHandler extends EventHandler {
-    private readonly batScript: string = '../scripts/windows.sh';
-    private readonly bashScript: string = '../scripts/darwin.sh 2>/dev/null';
+type EventMap = Record<string, Array<(...args: any[]) => void>>;
 
-    constructor(delay: number) {
-        super();
+class FileHandler {
+    private readonly batScript: string = path.resolve('../src/scripts/windows.bat');
+    private readonly bashScript: string = path.resolve('../src/scripts/darwin.sh');
 
-        setInterval(() => {
-            const avatarArray = this.cycleHandler();
-            if (avatarArray.length > 0)
-                this.emit('file', avatarArray);
-        }, delay * 1000);
+    private readonly events: EventMap;
+
+    public delay: number = 0;
+
+    constructor() {
+        this.events = {};
     }
 
-    private cycleHandler(): string[] {
+    public startCycleHandler(): void {
         const isWindows: boolean = process.platform === 'win32';
         const scriptPath: string = isWindows ? this.batScript : this.bashScript;
 
-        try {
-            const output: string = execSync(
-                `${isWindows ? 'cmd /c' : 'bash'} ${scriptPath}`,
-                { encoding: 'utf-8' });
+        setInterval(() => {
+            try {
+                const output: string = execSync(
+                    `${isWindows ? 'cmd /c' : `chmod +x ${scriptPath} && bash`} ${scriptPath}`,
+                    { encoding: 'utf-8' });
 
-            return output.startsWith('SUCCESS:')
-                ? output.split('\n').filter(l => l !== '' && l !== 'SUCCESS:')
-                : [];
-        } catch (error: any) {
-            console.log(error.message);
-            return [];
-        }
+                const avatarArray = output.startsWith('SUCCESS:')
+                    ? output.split('\n').filter(l => l !== '' && l !== 'SUCCESS:')
+                    : [];
+
+                if (avatarArray.length > 0)
+                    this.emit('file', avatarArray);
+            } catch (error: any) {
+                console.log(error);
+            }
+        }, this.delay * 1000);
+    }
+
+    public on<T extends any[]>(event: string, listener: (...args: T) => void): void {
+        if (!this.events[event])
+            this.events[event] = [];
+        this.events[event].push(listener as (...args: any[]) => void);
+    }
+
+    private emit<T extends any[]>(event: string, ...args: T): void {
+        const listeners = this.events[event];
+        if (listeners)
+            for (const listener of listeners)
+                listener(...args);
     }
 }
 

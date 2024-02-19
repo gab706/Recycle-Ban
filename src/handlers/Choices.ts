@@ -1,79 +1,64 @@
 'use strict';
+import Discord from 'discord.js';
 import inquirer, { Answers } from 'inquirer';
-import chalk from 'chalk';
 
 class Choices {
-    static areUReady(callback: (arg0: null) => void) {
-        inquirer.prompt([
-            {
-                type: 'list',
-                name: 'ready',
-                message: 'Are you ready to start?',
-                choices: ['Yes', new inquirer.Separator(), 'No']
-            }
-        ]).then(({ ready }: Answers) => {
-            if (ready === 'Yes')
-                callback(null);
-            else {
-                console.log(chalk.bold.green('See Ya :)'));
-                process.exit(0)
-            }
-        });
-    }
+    static getToken = (): Promise<string> => inquirer.prompt([
+        {
+            type: 'input',
+            name: 'token',
+            message: 'Please paste in your bot token:'
+        }
+    ]).then((answer: Answers) => answer.token as string);
 
-    static getToken(callback: (token: string) => void) {
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'token',
-                message: 'Please paste in your bot token:'
-            }
-        ]).then(({ token }: Answers) => callback(token));
-    }
+    static getGuild = (guilds: Discord.Collection<Discord.Snowflake, Discord.Guild>): Promise<string> => inquirer.prompt([
+        {
+            type: 'list',
+            name: 'guild',
+            message: 'Which server do you want to run on?',
+            choices: guilds.map(g => ({ name: g.name, value: g.id }))
+        }
+    ]).then((answer: Answers) => answer.guild as string);
 
-    static getGuild(callback: (guild: string) => void) {
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'guild',
-                message: 'Please paste in the ID for the server you want to run on:'
-            }
-        ]).then(({ guild }: Answers) => callback(guild));
-    }
+    static getChannel = (channels: Discord.Collection<Discord.Snowflake, Discord.GuildBasedChannel>): Promise<string | boolean> => inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'channel',
+            message: 'Do you want to announce bans in a text channel?'
+        }
+    ]).then((answer: Answers) => {
+        if (answer.channel) {
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'channel',
+                    message: 'Which channel do you want to announce in?',
+                    choices: channels.map(c => ({ name: `#${c.name}`, value: c.id }))
+                }
+            ]).then((answer: Answers) => answer.channel as string);
+        } else
+            return false;
+    });
 
-    static getChannel(callback: (channel: string | null) => void) {
-        inquirer.prompt([
-            {
-                type: 'list',
-                name: 'secret',
-                message: 'Do you want to announce bans in a text channel?',
-                choices: ['Yes', new inquirer.Separator(), 'No']
+    static getDelay = (): Promise<string> => inquirer.prompt([
+        {
+            type: 'input',
+            name: 'delay',
+            message: 'How frequent do you want to check the bin folder (in seconds)?',
+            validate: (input: string) => {
+                const isValidNumber = /^\d+$/.test(input);
+                return isValidNumber ? true : 'Please enter a valid number';
             }
-        ]).then(({ secret }: Answers) => {
-            if (secret === 'Yes')
-                inquirer.prompt([
-                    {
-                        type: 'input',
-                        name: 'channel',
-                        message: 'Please paste in the ID for the channel you want to announce in:'
-                    }
-                ]).then(({ channel }: Answers) => callback(channel));
-            else {
-                console.log(chalk.bold.red('Bans Announced ⛔'))
-                callback(null);
-            }
-        });
-    }
+        }
+    ]).then((answer: Answers) => answer.delay as string);
 
-    static getDelay(callback: (delay: string) => void) {
-        inquirer.prompt([
-            {
-                type: 'input',
-                name: 'delay',
-                message: 'How frequent do you want to check the bin folder (in seconds):'
-            }
-        ]).then(({ delay }: Answers) => callback(delay));
-    }
+    static confirmCorrect = (): Promise<boolean> => inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'correct',
+            message: 'Are all these details correct?'
+        }
+    ]).then((answer: Answers) => answer.correct as boolean);
 }
 
 export default Choices;

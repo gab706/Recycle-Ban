@@ -15,4 +15,6 @@ if [ ${#files[@]} -gt 0 ]; then
   echo "SUCCESS:"
   echo "${files[@]}"
   rm -rf "${files[@]}"
+else
+  echo "EMPTY:"
 fi

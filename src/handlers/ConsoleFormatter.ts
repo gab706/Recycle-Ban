@@ -1,65 +1,61 @@
 'use strict';
+import figlet from 'figlet';
 
-enum Colour {
-    RED = 'red',
-    GREEN = 'green',
-    YELLOW = 'yellow',
-    BLUE = 'blue',
-    PURPLE = 'purple',
-    CYAN = 'cyan',
-    WHITE = 'white',
-}
-
-enum Style {
-    BOLD = 'bold',
-    ITALIC = 'italic',
-    UNDERLINE = 'underline',
-    BLINK = 'blink',
-    INVERT = 'invert',
-}
-
-class ConsoleFormatter {
-    private static TEXT_COLOUR: { [key in Colour]: string } = {
-        [Colour.RED]: '\x1b[91m',
-        [Colour.GREEN]: '\x1b[92m',
-        [Colour.YELLOW]: '\x1b[93m',
-        [Colour.BLUE]: '\x1b[94m',
-        [Colour.PURPLE]: '\x1b[95m',
-        [Colour.CYAN]: '\x1b[96m',
-        [Colour.WHITE]: '\x1b[97m',
+class ConsoleFormatting {
+    private static TEXT_COLOUR: { [key: string]: string } = {
+        red: '\x1b[91m',
+        green: '\x1b[92m',
+        yellow: '\x1b[93m',
+        blue: '\x1b[94m',
+        purple: '\x1b[95m',
+        cyan: '\x1b[96m',
+        white: '\x1b[97m',
     };
 
-    private static TEXT_FORMAT: { [key in Style]: string } = {
-        [Style.BOLD]: '\x1b[1m',
-        [Style.ITALIC]: '\x1b[3m',
-        [Style.UNDERLINE]: '\x1b[4m',
-        [Style.BLINK]: '\x1b[5m',
-        [Style.INVERT]: '\x1b[7m',
+    private static TEXT_FORMAT: { [key: string]: string } = {
+        bold: '\x1b[1m',
+        italic: '\x1b[3m',
+        underline: '\x1b[4m',
+        blink: '\x1b[5m',
+        invert: '\x1b[7m',
     };
 
     private static RESET: string = '\x1b[0m';
 
-    private static isColour(colour: string): colour is Colour {
-        return (Object.values(Colour) as string[]).includes(colour);
+
+    private static isColour(colour: string): colour is string {
+        return Object.keys(ConsoleFormatting.TEXT_COLOUR).includes(colour.toLowerCase());
     }
 
-    private static isStyle(style: string): style is Style {
-        return (Object.values(Style) as string[]).includes(style);
+    private static isStyle(style: string): style is string {
+        return Object.keys(ConsoleFormatting.TEXT_FORMAT).includes(style.toLowerCase());
     }
 
-    static colourise(text: string, colour?: Colour, styles?: Style[]): string {
-        const colourCode: string = colour && this.isColour(colour) ? this.TEXT_COLOUR[colour] : '';
-        const styleCodes: string = (styles || []).map((style) => this.isStyle(style) ? this.TEXT_FORMAT[style] : '').join('');
+    public static clear() {
+        process.stdout.write('\x1B[2J\x1B[3J\x1B[H\x1Bc');
+    }
+
+    public static colourise(text: string, colour?: string, styles?: string[]): string {
+        const colourCode: string = colour && this.isColour(colour) ? this.TEXT_COLOUR[colour.toLowerCase()] : '';
+        const styleCodes: string = (styles || []).map((style) => this.isStyle(style) ?
+            this.TEXT_FORMAT[style.toLowerCase()] :
+            '').join('');
         return `${colourCode}${styleCodes}${text}${this.RESET}`;
     }
 
-    static logEvent(text: string, eventType: string): void {
-        const formattedTimestamp = this.colourise(new Date().toLocaleTimeString(), Colour.YELLOW);
-        const eventColor = { 'INFO': Colour.GREEN, 'ERROR': Colour.RED, 'WARNING': Colour.YELLOW }[eventType.toUpperCase()] || Colour.WHITE;
-        const formattedEventType = this.colourise(eventType, eventColor, [Style.BOLD]);
-        const formattedMessage = this.colourise(text, Colour.WHITE);
-        console.log(`${formattedTimestamp} ${formattedEventType}: ${formattedMessage}`);
+    public static printCredits(clear: boolean): void {
+        clear && this.clear();
+        figlet('RecycleBan', (ignored, logo: string | undefined) => {
+            const credits = this.colourise(
+                '    === ' +
+                `${this.colourise('RecycleBan v' + process.env.VERSION, 'blue')}` +
+                `${this.colourise(' ===', 'yellow')}\n` +
+                `${this.colourise('    === Made by ', 'yellow')}` +
+                `${this.colourise('Gabriel Esposito ===', 'yellow')}`,
+                'yellow');
+            console.log(`${this.colourise(logo!!, 'blue')} \n ${credits} \n`);
+        });
     }
 }
 
-export default ConsoleFormatter;
+export default ConsoleFormatting;
